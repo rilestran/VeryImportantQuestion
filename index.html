@@ -98,8 +98,6 @@ button {
 
 <audio id="loveSong" src="George_Micheal_-_Careless_Whisper_(mp3.pm).mp3"></audio>
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
 <script>
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
@@ -115,6 +113,8 @@ let posY = window.innerHeight * 0.5;
 let velocityX = 0;
 let velocityY = 0;
 
+let isActivated = false; // 👈 NEW
+
 document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -128,10 +128,17 @@ function animate() {
     const dx = centerX - mouseX;
     const dy = centerY - mouseY;
     const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const activationDistance = 160; // 👈 Only activates when close
     const safeDistance = 220;
 
-    // Accelerate away from mouse
-    if (distance < safeDistance && distance > 0) {
+    // Activate only when mouse is close
+    if (distance < activationDistance) {
+        isActivated = true;
+    }
+
+    // Only move AFTER activation
+    if (isActivated && distance > 0) {
         const force = (safeDistance - distance) / safeDistance;
         const accel = 3.5 * force;
 
@@ -139,7 +146,6 @@ function animate() {
         velocityY += (dy / distance) * accel;
     }
 
-    // Apply friction
     velocityX *= 0.92;
     velocityY *= 0.92;
 
@@ -169,7 +175,6 @@ function animate() {
         velocityY = -Math.abs(velocityY) - 2;
     }
 
-    // Extra anti-corner boost
     const edgeBuffer = 40;
     if (posX < edgeBuffer) velocityX += 1.5;
     if (posX > maxX - edgeBuffer) velocityX -= 1.5;
