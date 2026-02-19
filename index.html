@@ -11,17 +11,26 @@ body {
     height: 100vh;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
     font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
     position: relative;
 }
 
-h1 {
-    position: absolute;
-    width: 100%;
+.container {
     text-align: center;
-    top: 20%;
+}
+
+h1 {
     font-size: 2.5rem;
     color: white;
+    margin-bottom: 40px;
+}
+
+.button-row {
+    position: relative;
+    height: 60px;
 }
 
 button {
@@ -31,28 +40,25 @@ button {
     border-radius: 10px;
     cursor: pointer;
     position: absolute;
-    z-index: 2;
 }
 
 #yesBtn {
     background-color: #ff4d6d;
     color: white;
-    left: 45%;
-    top: 50%;
+    left: 40%;
+    transform: translateX(-50%);
 }
 
 #noBtn {
     background-color: white;
     color: #ff4d6d;
-    left: 55%;
-    top: 50%;
+    left: 60%;
+    transform: translateX(-50%);
 }
 
 .success-container {
     position: absolute;
-    width: 100%;
     text-align: center;
-    top: 35%;
     display: none;
 }
 
@@ -84,9 +90,14 @@ button {
 
 <body>
 
-<h1>Jennifer, Will you be my Valentine? 💖</h1>
-<button id="yesBtn">Yes</button>
-<button id="noBtn">No</button>
+<div class="container">
+    <h1>Jennifer, Will you be my Valentine? 💖</h1>
+
+    <div class="button-row">
+        <button id="yesBtn">Yes</button>
+        <button id="noBtn">No</button>
+    </div>
+</div>
 
 <div class="success-container" id="successContainer">
     <div class="success-message">
@@ -104,16 +115,15 @@ const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const successContainer = document.getElementById("successContainer");
 const loveSong = document.getElementById("loveSong");
-const title = document.querySelector("h1");
+const container = document.querySelector(".container");
 
-let mouseX = window.innerWidth / 2;
-let mouseY = window.innerHeight / 2;
-
-let posX = window.innerWidth * 0.55;
-let posY = window.innerHeight * 0.5;
+let mouseX = 0;
+let mouseY = 0;
 
 let velocityX = 0;
 let velocityY = 0;
+
+let isActivated = false; // won't move until mouse close
 
 document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
@@ -122,18 +132,23 @@ document.addEventListener("mousemove", (e) => {
 
 function animate() {
     const rect = noBtn.getBoundingClientRect();
-    const centerX = posX + rect.width / 2;
-    const centerY = posY + rect.height / 2;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
 
     const dx = centerX - mouseX;
     const dy = centerY - mouseY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const safeDistance = 200;
+    const activationDistance = 140;
 
-    if (distance < safeDistance && distance > 0) {
-        const force = (safeDistance - distance) / safeDistance;
-        const accel = 1.5 * force;
+    // Activate only when mouse gets close
+    if (distance < activationDistance) {
+        isActivated = true;
+    }
+
+    if (isActivated && distance > 0) {
+        const force = (activationDistance - distance) / activationDistance;
+        const accel = 1.6 * force;
 
         velocityX += (dx / distance) * accel;
         velocityY += (dy / distance) * accel;
@@ -142,17 +157,14 @@ function animate() {
     velocityX *= 0.92;
     velocityY *= 0.92;
 
-    posX += velocityX;
-    posY += velocityY;
+    const newLeft = rect.left + velocityX;
+    const newTop = rect.top + velocityY;
 
     const maxX = window.innerWidth - rect.width;
     const maxY = window.innerHeight - rect.height;
 
-    posX = Math.max(0, Math.min(maxX, posX));
-    posY = Math.max(0, Math.min(maxY, posY));
-
-    noBtn.style.left = posX + "px";
-    noBtn.style.top = posY + "px";
+    noBtn.style.left = Math.max(0, Math.min(maxX, newLeft)) + "px";
+    noBtn.style.top = Math.max(0, Math.min(maxY, newTop)) + "px";
 
     requestAnimationFrame(animate);
 }
@@ -172,9 +184,7 @@ function createHearts() {
 }
 
 yesBtn.addEventListener("click", () => {
-    yesBtn.style.display = "none";
-    noBtn.style.display = "none";
-    title.style.display = "none";
+    document.querySelector(".container").style.display = "none";
     successContainer.style.display = "block";
 
     loveSong.play().catch(() => {});
