@@ -130,15 +130,15 @@ let posY = window.innerHeight * 0.5;
 let vx = 0;
 let vy = 0;
 
-// 🎯 Tuned settings (less extreme)
-const SAFE_DISTANCE = 100;   // reacts closer now
+// 🎯 Tuned settings
+const SAFE_DISTANCE = 260;   // distance where it starts reacting
 const PREDICT_FRAMES = 3;
-const FRICTION = 0.90;       // smoother/slower
-const MAX_SPEED = 18;        // slower top speed
+const FRICTION = 0.90;
+const MAX_SPEED = 18;
 const WIGGLE = 0.5;
 
 // Smaller wall padding
-const EDGE_MARGIN = 60;      // less padding from edges
+const EDGE_MARGIN = 60;
 const EDGE_STRENGTH = 4.5;
 
 function clamp(v, min, max) {
@@ -164,11 +164,16 @@ function animate() {
   let dy = cy - targetMouseY;
   let dist = Math.hypot(dx, dy);
 
+  // Only react when close enough
   if (dist < SAFE_DISTANCE && dist > 0.0001) {
     const t = (SAFE_DISTANCE - dist) / SAFE_DISTANCE;
-    const accel = 2.0 + 8.0 * t * t; // softer acceleration
+    const accel = 2.0 + 8.0 * t * t;
     vx += (dx / dist) * accel;
     vy += (dy / dist) * accel;
+
+    // ✅ Stop tiny drifting: only add randomness when close
+    vx += (Math.random() - 0.5) * WIGGLE;
+    vy += (Math.random() - 0.5) * WIGGLE;
   }
 
   // Light edge repulsion (prevents corner sticking)
@@ -176,10 +181,6 @@ function animate() {
   if (posX > maxX - EDGE_MARGIN) vx -= EDGE_STRENGTH;
   if (posY < EDGE_MARGIN) vy += EDGE_STRENGTH;
   if (posY > maxY - EDGE_MARGIN) vy -= EDGE_STRENGTH;
-
-  // Small randomness
-  vx += (Math.random() - 0.5) * WIGGLE;
-  vy += (Math.random() - 0.5) * WIGGLE;
 
   // Apply friction
   vx *= FRICTION;
