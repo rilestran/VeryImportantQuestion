@@ -37,14 +37,14 @@ button {
 #yesBtn {
     background-color: #ff4d6d;
     color: white;
-    left: 45%;
+    left: 48%;
     top: 50%;
 }
 
 #noBtn {
     background-color: white;
     color: #ff4d6d;
-    left: 55%;
+    left: 52%;
     top: 50%;
 }
 
@@ -85,7 +85,7 @@ button {
 
 <body>
 
-<h1>Jennifer, Will you be my Valentine? 💖</h1>
+<h1>Jennifer, will you be my Valentine? 💖</h1>
 <button id="yesBtn">Yes</button>
 <button id="noBtn">No</button>
 
@@ -98,6 +98,8 @@ button {
 
 <audio id="loveSong" src="George_Micheal_-_Careless_Whisper_(mp3.pm).mp3"></audio>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <script>
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
@@ -107,13 +109,13 @@ const loveSong = document.getElementById("loveSong");
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 
-let posX = window.innerWidth * 0.55;
+let posX = window.innerWidth * 0.52;
 let posY = window.innerHeight * 0.5;
 
 let velocityX = 0;
 let velocityY = 0;
 
-let isActivated = false; // 👈 NEW
+let isActivated = false;
 
 document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
@@ -129,25 +131,23 @@ function animate() {
     const dy = centerY - mouseY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const activationDistance = 80; // 👈 Only activates when close
+    const activationDistance = 100;  // extremely close trigger
     const safeDistance = 220;
 
-    // Activate only when mouse is close
     if (distance < activationDistance) {
         isActivated = true;
     }
 
-    // Only move AFTER activation
     if (isActivated && distance > 0) {
         const force = (safeDistance - distance) / safeDistance;
-        const accel = 3.5 * force;
+        const accel = 2.6 * force;   // slowed from 3.5
 
         velocityX += (dx / distance) * accel;
         velocityY += (dy / distance) * accel;
     }
 
-    velocityX *= 0.92;
-    velocityY *= 0.92;
+    velocityX *= 0.94;   // more friction = slower
+    velocityY *= 0.94;
 
     posX += velocityX;
     posY += velocityY;
@@ -155,31 +155,23 @@ function animate() {
     const maxX = window.innerWidth - rect.width;
     const maxY = window.innerHeight - rect.height;
 
-    // Bounce off left/right walls
     if (posX <= 0) {
         posX = 0;
-        velocityX = Math.abs(velocityX) + 2;
+        velocityX = Math.abs(velocityX);
     }
     if (posX >= maxX) {
         posX = maxX;
-        velocityX = -Math.abs(velocityX) - 2;
+        velocityX = -Math.abs(velocityX);
     }
 
-    // Bounce off top/bottom walls
     if (posY <= 0) {
         posY = 0;
-        velocityY = Math.abs(velocityY) + 2;
+        velocityY = Math.abs(velocityY);
     }
     if (posY >= maxY) {
         posY = maxY;
-        velocityY = -Math.abs(velocityY) - 2;
+        velocityY = -Math.abs(velocityY);
     }
-
-    const edgeBuffer = 40;
-    if (posX < edgeBuffer) velocityX += 1.5;
-    if (posX > maxX - edgeBuffer) velocityX -= 1.5;
-    if (posY < edgeBuffer) velocityY += 1.5;
-    if (posY > maxY - edgeBuffer) velocityY -= 1.5;
 
     noBtn.style.left = posX + "px";
     noBtn.style.top = posY + "px";
