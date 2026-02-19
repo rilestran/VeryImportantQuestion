@@ -52,7 +52,7 @@ button {
     position: absolute;
     width: 100%;
     text-align: center;
-    top: 40%;
+    top: 35%;
     display: none;
     z-index: 2;
 }
@@ -64,13 +64,12 @@ button {
 }
 
 .success-container img {
-    width: 250px;
+    width: 280px;
     border-radius: 20px;
 }
 
 .heart {
     position: absolute;
-    color: #ff4d6d;
     font-size: 24px;
     animation: fall linear forwards;
 }
@@ -94,10 +93,10 @@ button {
     <div class="success-message">
         Knew you were gonna say YES! HEHEHE YAY 💕 I love you!!!
     </div>
-    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Dancing Cat">
+    <img src="https://media.tenor.com/8xJbZ0Wz9VgAAAAC/silly-cat-dance.gif" alt="Silly Dancing Cat">
 </div>
 
-<audio id="loveSong" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+<audio id="loveSong" src="George_Micheal_-_Careless_Whisper_(mp3.pm).mp3"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -129,17 +128,18 @@ function animate() {
     const dx = centerX - mouseX;
     const dy = centerY - mouseY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const safeDistance = 200;
+    const safeDistance = 220;
 
     if (distance < safeDistance && distance > 0) {
         const force = (safeDistance - distance) / safeDistance;
-        const accel = 1.8 * force;
+        const accel = 3.5 * force;  // Faster movement
+
         velocityX += (dx / distance) * accel;
         velocityY += (dy / distance) * accel;
     }
 
-    velocityX *= 0.92;
-    velocityY *= 0.92;
+    velocityX *= 0.90;
+    velocityY *= 0.90;
 
     posX += velocityX;
     posY += velocityY;
@@ -158,7 +158,7 @@ function animate() {
 animate();
 
 function createHearts() {
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 70; i++) {
         const heart = document.createElement("div");
         heart.classList.add("heart");
         heart.innerText = "💖";
@@ -179,8 +179,8 @@ yesBtn.addEventListener("click", () => {
     loveSong.play();
 
     confetti({
-        particleCount: 200,
-        spread: 120,
+        particleCount: 300,
+        spread: 140,
         origin: { y: 0.6 }
     });
 
