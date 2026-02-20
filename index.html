@@ -13,38 +13,38 @@
     overflow-x: hidden;
   }
 
-  /* Sections */
   .page {
     min-height: 100vh;
     box-sizing: border-box;
   }
 
-  /* Page 1 layout (normal flow, no absolute title/success) */
+  /* ================= PAGE 1 ================= */
   #page1 {
-    padding: 48px 16px 60px;
+    min-height: 100vh;
+    padding: 40px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center; /* 🔥 vertical center */
     gap: 22px;
     position: relative;
-    overflow: hidden; /* keeps hearts tidy */
+    overflow: hidden;
+    text-align: center;
   }
 
   #titleText {
     margin: 0;
-    text-align: center;
     font-size: 2.5rem;
     color: white;
     max-width: 900px;
   }
 
-  /* Buttons area */
+  /* Button movement zone */
   .button-zone {
     width: 100%;
-    max-width: 720px;
+    max-width: 700px;
     height: 140px;
-    position: relative; /* No button moves inside here */
+    position: relative;
   }
 
   button {
@@ -62,7 +62,7 @@
     background-color: #ff4d6d;
     color: white;
     left: 38%;
-    top: 45%;
+    top: 50%;
     transform: translate(-50%, -50%);
   }
 
@@ -70,16 +70,15 @@
     background-color: white;
     color: #ff4d6d;
     left: 62%;
-    top: 45%;
+    top: 50%;
     transform: translate(-50%, -50%);
   }
 
-  /* Success content (normal flow, no absolute) */
+  /* Success block */
   .success-container {
     display: none;
     text-align: center;
     color: white;
-    width: 100%;
     max-width: 900px;
   }
 
@@ -94,7 +93,7 @@
     border-radius: 20px;
   }
 
-  /* Scroll indicator under gif */
+  /* Scroll indicator */
   .scroll-indicator {
     margin-top: 18px;
     color: white;
@@ -110,7 +109,6 @@
   .scroll-arrow {
     font-size: 2rem;
     animation: bounce 1.4s infinite;
-    line-height: 1;
   }
 
   @keyframes bounce {
@@ -133,17 +131,15 @@
     }
   }
 
-  /* Page 2 */
+  /* ================= PAGE 2 ================= */
   #page2 {
     display: none;
-    padding: 30px 16px 70px;
+    min-height: 100vh;
+    padding: 40px 16px;
     box-sizing: border-box;
-  }
 
-  .card-wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
+    display: flex; /* 🔥 centered card */
+    align-items: center;
     justify-content: center;
   }
 
@@ -186,9 +182,7 @@
 
 <!-- PAGE 2 -->
 <section class="page" id="page2">
-  <div class="card-wrap">
-    <img class="card-image" src="valentine-card.png" alt="Valentine card" />
-  </div>
+  <img class="card-image" src="valentine-card.png" alt="Valentine card" />
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -202,10 +196,8 @@
   const page2 = document.getElementById("page2");
   const buttonZone = document.getElementById("buttonZone");
 
-  // ✅ Arm movement after user interacts (mouse OR touch)
   let armed = false;
 
-  // Pointer tracking
   let mouseX = -99999, mouseY = -99999;
   let lastMouseX = mouseX, lastMouseY = mouseY;
   let mouseVX = 0, mouseVY = 0;
@@ -237,15 +229,14 @@
     updatePointer(t.clientX, t.clientY);
   }, { passive: true });
 
-  // Button physics inside the button zone
   let vx = 0, vy = 0;
   let posX, posY;
 
   function syncStartFromCSS() {
     const rect = noBtn.getBoundingClientRect();
     const zone = buttonZone.getBoundingClientRect();
-    posX = rect.left - zone.left; // relative to zone
-    posY = rect.top - zone.top;   // relative to zone
+    posX = rect.left - zone.left;
+    posY = rect.top - zone.top;
   }
 
   window.addEventListener("load", syncStartFromCSS);
@@ -255,7 +246,6 @@
   const PREDICT_FRAMES = 3;
   const FRICTION = 0.88;
   const MAX_SPEED = 18;
-
   const EDGE_MARGIN = 20;
   const EDGE_STRENGTH = 4.5;
 
@@ -275,7 +265,6 @@
       return;
     }
 
-    // Stay still until user interacts
     if (!armed) {
       vx = 0; vy = 0;
       posX = clamp(posX, 0, maxX);
@@ -289,7 +278,6 @@
     const targetMouseX = mouseX + mouseVX * PREDICT_FRAMES;
     const targetMouseY = mouseY + mouseVY * PREDICT_FRAMES;
 
-    // Convert mouse position into zone-relative coords
     const mx = targetMouseX - zone.left;
     const my = targetMouseY - zone.top;
 
@@ -300,25 +288,15 @@
     const dy = cy - my;
     const dist = Math.hypot(dx, dy);
 
-    if (dist >= TRIGGER_DISTANCE) {
-      vx = 0; vy = 0;
-      posX = clamp(posX, 0, maxX);
-      posY = clamp(posY, 0, maxY);
-      noBtn.style.left = posX + "px";
-      noBtn.style.top = posY + "px";
-      requestAnimationFrame(animate);
-      return;
-    }
-
-    // Run away
-    if (dist > 0.0001) {
+    if (dist < TRIGGER_DISTANCE && dist > 0.0001) {
       const t = (TRIGGER_DISTANCE - dist) / TRIGGER_DISTANCE;
       const accel = 3.0 + 14.0 * t * t;
       vx += (dx / dist) * accel;
       vy += (dy / dist) * accel;
+    } else {
+      vx = 0; vy = 0;
     }
 
-    // Edge repulsion within the zone
     if (posX < EDGE_MARGIN) vx += EDGE_STRENGTH;
     if (posX > maxX - EDGE_MARGIN) vx -= EDGE_STRENGTH;
     if (posY < EDGE_MARGIN) vy += EDGE_STRENGTH;
@@ -346,7 +324,6 @@
   }
   requestAnimationFrame(animate);
 
-  // Hearts
   function createHearts() {
     for (let i = 0; i < 60; i++) {
       const heart = document.createElement("div");
@@ -360,22 +337,18 @@
   }
 
   yesBtn.addEventListener("click", () => {
-    // Hide question + buttons (guaranteed by ID)
     titleText.style.display = "none";
     yesBtn.style.display = "none";
     noBtn.style.display = "none";
     buttonZone.style.display = "none";
 
-    // Show success
     successContainer.style.display = "block";
 
-    // Music + confetti + hearts
     loveSong.play().catch(() => {});
     confetti({ particleCount: 250, spread: 130, origin: { y: 0.6 } });
     createHearts();
 
-    // Reveal card page (no auto scroll)
-    page2.style.display = "block";
+    page2.style.display = "flex";
   });
 </script>
 
