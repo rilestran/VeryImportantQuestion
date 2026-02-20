@@ -15,7 +15,7 @@
     position: relative;
   }
 
-  /* --- Page 1 layout --- */
+  /* --- Page layout --- */
   .page {
     min-height: 100vh;
     position: relative;
@@ -45,6 +45,7 @@
     touch-action: none; /* helps touch accuracy */
   }
 
+  /* Slightly more centered towards the left (tweak these if you want) */
   #yesBtn {
     background-color: #ff4d6d;
     color: white;
@@ -99,8 +100,9 @@
   #page2 {
     display: none;            /* hidden until YES */
     background: #ffffff00;    /* transparent over gradient */
-    padding: 40px 16px;
+    padding: 40px 16px 60px;
     box-sizing: border-box;
+    overflow: visible;
   }
 
   .card-wrap {
@@ -116,6 +118,31 @@
     border-radius: 18px;
     box-shadow: 0 18px 50px rgba(0,0,0,0.18);
     background: white;
+  }
+
+  /* Scroll indicator */
+  .scroll-indicator {
+    text-align: center;
+    margin: 30px 0 26px;
+    color: white;
+  }
+
+  .scroll-text {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .scroll-arrow {
+    font-size: 2rem;
+    animation: bounce 1.4s infinite;
+    line-height: 1;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
   }
 
   /* If someone prints it, this becomes the “next page” */
@@ -145,6 +172,11 @@
 
 <!-- PAGE 2 (YOUR CARD IMAGE) -->
 <section class="page" id="page2">
+  <div class="scroll-indicator">
+    <div class="scroll-text">Scroll down</div>
+    <div class="scroll-arrow">↓</div>
+  </div>
+
   <div class="card-wrap">
     <!-- Put your PNG in the same folder and name it valentine-card.png -->
     <img class="card-image" src="valentine-card.png" alt="Valentine card" />
@@ -335,7 +367,7 @@
   }
   requestAnimationFrame(animate);
 
-  // If cursor touches it, quick hop (kept as-is)
+  // If cursor touches it, quick hop
   noBtn.addEventListener("mouseenter", () => {
     vx += (Math.random() - 0.5) * 12;
     vy += (Math.random() - 0.5) * 12;
@@ -370,11 +402,8 @@
 
     createHearts();
 
-    // ✅ Reveal "next page" and scroll to it
+    // ✅ Reveal "next page" (NO auto-scroll)
     page2.style.display = "block";
-    setTimeout(() => {
-      page2.scrollIntoView({ behavior: "smooth" });
-    }, 900);
   });
 </script>
 
